@@ -8,12 +8,18 @@ st.set_page_config(page_title="Supply Chain Analysis", layout="wide")
 
 st.title("DataCo Supply Chain Data Analysis and Cleaning")
 
-# File uploader
-uploaded_file = st.file_uploader("Upload the DataCoSupplyChainDataset.csv", type=["csv"])
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file, encoding='latin1')
-    st.success("File successfully uploaded!")
+# Load the dataset directly from the same folder
+try:
+    df = pd.read_csv("DataCoSupplyChainDataset.csv", encoding='latin1')
+    st.success("Dataset loaded successfully!")
 
+    # ... rest of your Streamlit code ...
+
+except FileNotFoundError:
+    st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder as this script.")
+
+    
+    
     #  1. Data Understanding 
     st.header("1. Data Understanding")
     st.write("Preview of the dataset:")
