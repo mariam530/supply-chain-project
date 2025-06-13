@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import plotly.express as px
 
 st.set_page_config(page_title="Supply Chain Analysis", layout="wide")
 
@@ -13,13 +14,6 @@ try:
     df = pd.read_csv("DataCoSupplyChainDataset.csv", encoding='latin1')
     st.success("Dataset loaded successfully!")
 
-    # ... rest of your Streamlit code ...
-
-except FileNotFoundError:
-    st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder as this script.")
-
-    
-    
     #  1. Data Understanding 
     st.header("1. Data Understanding")
     st.write("Preview of the dataset:")
@@ -100,8 +94,6 @@ except FileNotFoundError:
         selected_cat = st.selectbox("Choose a categorical column", cat_cols)
         st.bar_chart(df[selected_cat].value_counts())
 
-
-
     #  6. Profit by Region 
     st.header(" Profit Distribution by Region")
     if 'order_region' in df.columns:
@@ -134,22 +126,8 @@ except FileNotFoundError:
     sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax5)
     st.pyplot(fig5)
 
-else:
-    st.warning(" Please upload a CSV file to start analysis.")
-
-
-
-import plotly.express as px
-
-# Univariate Analysis
-import plotly.express as px
-
-st.header("Univariate Analysis")
-uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file, encoding="latin1")
-    st.success("File successfully uploaded")
-
+    # 10. Univariate Analysis
+    st.header("Univariate Analysis")
     selected_uni = st.selectbox("Choose a column for univariate analysis", df.columns)
 
     st.write("Summary Statistics:")
@@ -167,10 +145,9 @@ if uploaded_file is not None:
             labels={selected_uni: selected_uni, 'count': 'Count'},
             title=f'Value Counts of {selected_uni}'
         )
-
     st.plotly_chart(fig_uni)
 
-
+    # 11. Bivariate Analysis
     st.header("Bivariate Analysis")
 
     col1 = st.selectbox("Select first column", df.columns, key="bi_col1")
@@ -189,9 +166,9 @@ if uploaded_file is not None:
     if fig_bi:
         st.plotly_chart(fig_bi)
 
+    # 12. Multivariate Analysis
     st.header("Multivariate Analysis (Scatter Matrix with Plotly)")
 
-    num_cols = df.select_dtypes(include='number').columns.tolist()
     selected_multi = st.multiselect("Choose up to 5 numeric columns", num_cols, max_selections=5)
 
     if len(selected_multi) >= 2:
@@ -200,6 +177,7 @@ if uploaded_file is not None:
     else:
         st.info("Please select at least 2 numeric columns.")
 
-else:
-    st.warning("⚠️ Please upload a CSV file to begin analysis.")
+except FileNotFoundError:
+    st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
+
 
