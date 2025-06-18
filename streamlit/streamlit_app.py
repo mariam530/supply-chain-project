@@ -113,10 +113,10 @@ try:
         return 'medium'
       else:
         return 'high'
-    df['profit_category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
+    df['profit_category'] = df['Order Item Profit Ratio'].apply(classify_profit)
 
 
-    st.write(df[['Order_Item_Profit_Ratio', 'profit_category']].head())
+    st.write(df[['Order Item Profit Ratio', 'profit_category']].head())
 
     fig1, ax1 = plt.subplots()
     sns.countplot(data=df, x='profit_category', ax=ax1)
