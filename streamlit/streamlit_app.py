@@ -82,8 +82,6 @@ try:
     st.header(" Profit Category Classification")
     st.write(df[['order_item_profit_ratio', 'profit_category']].head())
 
-except FileNotFoundError:
-    st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
 
     #  3. Profit Classification 
     st.header(" Profit Category Classification")
@@ -99,11 +97,11 @@ except FileNotFoundError:
         return 'High'
 
 
-    df['Profit_Category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
+    df['profit_category'] = df['order_item_profit_ratio'].apply(classify_profit)
 
 
 
-    st.write(df[['Order Item Profit Ratio', 'profit_category']].head())
+    st.write(df[['order_item_profit_ratio', 'profit_category']].head())
 
     fig1, ax1 = plt.subplots()
     sns.countplot(data=df, x='profit_category', ax=ax1)
@@ -259,7 +257,6 @@ except FileNotFoundError:
 
 except FileNotFoundError:
     st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
-
 
 
 
