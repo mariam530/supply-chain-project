@@ -183,39 +183,29 @@ try:
         st.bar_chart(risk_by_type)
 
 
-    # 9. Profitability Category Pie Chart (twice as requested)
-    st.header(" Average Profit Margin by Profitability Category")
+    # 9. Profitability Category Pie Chart 
+   
+    #  Order Profit Per Order - Pie Chart
+    st.header("Order Profit Per Order - Pie Chart")
 
-    if 'profitability_category' in df.columns and 'profit_margin' in df.columns:
-        avg_profit = df.groupby('profitability_category')['profit_margin'].mean().reset_index()
-        fig_pie1 = px.pie(
-            data_frame=avg_profit,
-            names='profitability_category',
-            values='profit_margin',
-            title='Average Profit Margin per Profitability Category (Chart 1)'
-        )
-        st.plotly_chart(fig_pie1)
+    df['order_profit_category'] = pd.cut(df['Order Profit Per Order'],
+                                         bins=[-float('inf'), 0, 200, 500, float('inf')],
+                                         labels=['Loss', 'Low', 'Medium', 'High'])
 
-        fig_pie2 = px.pie(
-            data_frame=avg_profit,
-            names='profitability_category',
-            values='profit_margin',
-            title='Average Profit Margin per Profitability Category (Chart 2)'
-        )
-        st.plotly_chart(fig_pie2)
-    else:
-        st.warning("Columns 'profitability_category' or 'profit_margin' not found in the dataset.")
+    profit_counts = df['order_profit_category'].value_counts().reset_index()
+    profit_counts.columns = ['order_profit_category', 'count']
 
-    #  10. Correlation Heatmap 
-    st.header(" Correlation Heatmap")
-    corr = df.select_dtypes(include='number').corr()
-    fig5, ax5 = plt.subplots(figsize=(10, 6))
-    # sns.heatmap removed for new larger heatmap
-    st.pyplot(fig5)
+    fig_pie_profit = px.pie(profit_counts,
+                            names='order_profit_category',
+                            values='count',
+                            title='Order Profit Per Order Distribution by Category')
+    st.plotly_chart(fig_pie_profit)
 
-    
+
+#  10. Correlation Heatmap 
+   
     # 🔍 Correlation Heatmap (After Column Removal)
-    st.header(" Enhanced Correlation Heatmap")
+    st.header("Correlation Heatmap")
     corr = df.select_dtypes(include='number').corr()
     fig_corr, ax_corr = plt.subplots(figsize=(16, 10))  
     sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax_corr)
