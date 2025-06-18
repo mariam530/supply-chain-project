@@ -5,8 +5,6 @@ import seaborn as sns
 import numpy as np
 import plotly.express as px
 
-
-
 st.set_page_config(page_title="Supply Chain Analysis", layout="wide")
 
 st.title("DataCo Supply Chain Data Analysis and Cleaning")
@@ -16,7 +14,8 @@ try:
     df = pd.read_csv("DataCoSupplyChainDataset.csv", encoding='latin1')
     st.success("Dataset loaded successfully!")
     st.write("Initial structure placeholder")
-    #  1. Data Understanding 
+
+    # 1. Data Understanding
     st.header("1. Data Understanding")
     st.write("Preview of the dataset:")
     st.dataframe(df.head())
@@ -40,66 +39,51 @@ try:
         st.subheader("Categorical Columns")
         st.dataframe(df.describe(include='object'))
 
-    #  2. Data Cleaning 
+    # 2. Data Cleaning
     st.header("Data Cleaning")
     df.columns = df.columns.str.strip().str.replace(" ", "_").str.lower()
     df.drop_duplicates(inplace=True)
     df.fillna(0, inplace=True)
     st.write(" Cleaned data preview:")
-    # 2.1 Remove Irrelevant Columns
+
     columns_to_drop = [
-        'customer_id',
-        'customer_email',
-        'customer_password',
-        'customer_street',
-        'customer_zipcode',
-        'order_id',
-        'order_customer_id',
-        'order_item_id',
-        'order_item_cardprod_id',
-        'product_card_id',
-        'product_category_id',
-        'product_image',
-        'product_description'
+        'customer_id', 'customer_email', 'customer_password', 'customer_street', 'customer_zipcode',
+        'order_id', 'order_customer_id', 'order_item_id', 'order_item_cardprod_id', 'product_card_id',
+        'product_category_id', 'product_image', 'product_description'
     ]
     columns_to_drop = [col for col in columns_to_drop if col in df.columns]
     df.drop(columns=columns_to_drop, inplace=True)
     st.success("Irrelevant columns dropped.")
-
     st.dataframe(df.head())
-    
-     
-# 2.2 DOMAIN KNOWLEDGE FEATURES
 
-# Profitability_Flag
-    df['Is_Profitable_Order'] = (df['order_profit_per_order'] > 0).astype(int)
+    # 2.2 DOMAIN KNOWLEDGE FEATURES
+    df['is_profitable_order'] = (df['order_profit_per_order'] > 0).astype(int)
+    df['is_zero_profit'] = (df['order_profit_per_order'] == 0).astype(int)
+    df['order_item_profit_ratio'] = df['order_profit_per_order'] / df['order_item_total']
+    df['profit_margin'] = df['order_item_profit_ratio']
+    df['profitability_category'] = pd.cut(df['profit_margin'], bins=[-1, 0, 0.2, 0.5, 1], labels=['Loss', 'Low', 'Medium', 'High'])
+    df['low_profit_high_sales'] = ((df['profit_margin'] < 0.1) & (df['order_item_total'] > 500)).astype(int)
+    df['order_value_category'] = pd.cut(df['order_item_total'], bins=[0, 100, 500, 1000, float('inf')], labels=['Low', 'Medium', 'High', 'Very High'])
+    df['customer_segment'] = pd.cut(df['sales_per_customer'], bins=[0, 100, 500, 1000, np.inf], labels=['Low', 'Medium', 'High', 'Very High'])
 
-# Zero_Profit_Flag
-    df['Is_Zero_Profit'] = (df['order_profit_per_order'] == 0).astype(int)
+    # Define classify_profit function
+    def classify_profit(ratio):
+        if ratio <= 0:
+            return 'Loss'
+        elif ratio <= 0.2:
+            return 'Low'
+        elif ratio <= 0.5:
+            return 'Medium'
+        else:
+            return 'High'
 
-# Profit_Ratio
-    df['Order_Item_Profit_Ratio'] = df['order_profit_per_order'] / df['order_item_total']
+    df['profit_category'] = df['order_item_profit_ratio'].apply(classify_profit)
 
-# Profit_Margin_Copy
-    df['Profit_Margin'] = df['Order_Item_Profit_Ratio']
+    st.header(" Profit Category Classification")
+    st.write(df[['order_item_profit_ratio', 'profit_category']].head())
 
-# Profit_Category_Binning
-    df['Profitability_Category'] = pd.cut(df['Profit_Margin'], bins=[-1, 0, 0.2, 0.5, 1], labels=['Loss', 'Low', 'Medium', 'High'])
-
-# Low_Profit_High_Sales_Flag
-    df['Low_Profit_High_Sales'] = ((df['Profit_Margin'] < 0.1) & (df['order_item_total'] > 500)).astype(int)
-
-# Order_Value_Binning
-    df['Order_Value_Category'] = pd.cut(df['order_item_total'], bins=[0, 100, 500, 1000, float('inf')], labels=['Low', 'Medium', 'High', 'Very High'])
-
-# Customer_Segment_Binning
-    df['Customer_Segment'] = pd.cut(df['sales_per_customer'], bins=[0, 100, 500, 1000, np.inf], labels=['Low', 'Medium', 'High', 'Very High'])
-
-
-
-
-# Order_Type_Classification
-    df['Order_Type'] = np.where((df['order_item_product_price'] > 1000) & (df['order_item_discount'] < 100), 'premium', 'regular')
+except FileNotFoundError:
+    st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
 
     #  3. Profit Classification 
     st.header(" Profit Category Classification")
