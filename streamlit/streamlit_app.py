@@ -96,15 +96,7 @@ try:
 # Order_Quarter_Extraction
     df['Order_Quarter'] = pd.to_datetime(df['order date (DateOrders)']).dt.to_period('Q')
 
-# Custom_Profit_Level
-    def classify_profit(ratio):
-    if ratio < 0.2:
-        return 'low'
-    elif ratio <= 0.5:
-        return 'medium'
-    else:
-        return 'high'
-    df['Profit_Category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
+
 
 # Order_Type_Classification
     df['Order_Type'] = np.where((df['Order Item Product Price'] > 1000) & (df['Order Item Discount'] < 100), 'premium', 'regular')
