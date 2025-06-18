@@ -13,7 +13,7 @@ st.title("DataCo Supply Chain Data Analysis and Cleaning")
 try:
     df = pd.read_csv("DataCoSupplyChainDataset.csv", encoding='latin1')
     st.success("Dataset loaded successfully!")
-
+    st.write("Initial structure placeholder")
     #  1. Data Understanding 
     st.header("1. Data Understanding")
     st.write("Preview of the dataset:")
@@ -65,6 +65,49 @@ try:
     st.success("Irrelevant columns dropped.")
 
     st.dataframe(df.head())
+    
+     
+# 2.2 DOMAIN KNOWLEDGE FEATURES
+
+# Profitability_Flag
+    df['Is_Profitable_Order'] = (df['Order Profit Per Order'] > 0).astype(int)
+
+# Zero_Profit_Flag
+    df['Is_Zero_Profit'] = (df['Order Profit Per Order'] == 0).astype(int)
+
+# Profit_Ratio
+    df['Order_Item_Profit_Ratio'] = df['Order Profit Per Order'] / df['Order Item Total']
+
+# Profit_Margin_Copy
+    df['Profit_Margin'] = df['Order_Item_Profit_Ratio']
+
+# Profit_Category_Binning
+    df['Profitability_Category'] = pd.cut(df['Profit_Margin'], bins=[-1, 0, 0.2, 0.5, 1], labels=['Loss', 'Low', 'Medium', 'High'])
+
+# Low_Profit_High_Sales_Flag
+    df['Low_Profit_High_Sales'] = ((df['Profit_Margin'] < 0.1) & (df['Order Item Total'] > 500)).astype(int)
+
+# Order_Value_Binning
+    df['Order_Value_Category'] = pd.cut(df['Order Item Total'], bins=[0, 100, 500, 1000, float('inf')], labels=['Low', 'Medium', 'High', 'Very High'])
+
+# Customer_Segment_Binning
+    df['Customer_Segment'] = pd.cut(df['Sales per customer'], bins=[0, 100, 500, 1000, np.inf], labels=['Low', 'Medium', 'High', 'Very High'])
+
+# Order_Quarter_Extraction
+    df['Order_Quarter'] = pd.to_datetime(df['order date (DateOrders)']).dt.to_period('Q')
+
+# Custom_Profit_Level
+    def classify_profit(ratio):
+    if ratio < 0.2:
+        return 'low'
+    elif ratio <= 0.5:
+        return 'medium'
+    else:
+        return 'high'
+    df['Profit_Category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
+
+# Order_Type_Classification
+    df['Order_Type'] = np.where((df['Order Item Product Price'] > 1000) & (df['Order Item Discount'] < 100), 'premium', 'regular')
 
     #  3. Profit Classification 
     st.header(" Profit Category Classification")
