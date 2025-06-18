@@ -117,7 +117,7 @@ try:
       else:
         return 'High'
 
-# Then apply the function
+
     df['Profit_Category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
 
 
