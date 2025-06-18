@@ -95,8 +95,7 @@ try:
 # Customer_Segment_Binning
     df['Customer_Segment'] = pd.cut(df['sales_per_customer'], bins=[0, 100, 500, 1000, np.inf], labels=['Low', 'Medium', 'High', 'Very High'])
 
-# Order_Quarter_Extraction
-    df['Order_Quarter'] = pd.to_datetime(df['order_date']).dt.to_period('Q')
+
 
 # Custom_Profit_Level
 
