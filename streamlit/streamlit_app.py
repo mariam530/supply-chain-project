@@ -106,14 +106,20 @@ try:
 
     #  3. Profit Classification 
     st.header(" Profit Category Classification")
+    # Define classify_profit function
     def classify_profit(ratio):
-      if ratio < 0.2:
-        return 'low'
+      if ratio <= 0:
+        return 'Loss'
+      elif ratio <= 0.2:
+        return 'Low'
       elif ratio <= 0.5:
-        return 'medium'
+        return 'Medium'
       else:
-        return 'high'
-    df['profit_category'] = df['Order Item Profit Ratio'].apply(classify_profit)
+        return 'High'
+
+# Then apply the function
+    df['Profit_Category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
+
 
 
     st.write(df[['Order Item Profit Ratio', 'profit_category']].head())
