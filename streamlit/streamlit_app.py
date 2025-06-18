@@ -115,6 +115,7 @@ try:
         return 'high'
     df['profit_category'] = df['order_item_profit_ratio'].apply(classify_profit)
 
+
     st.write(df[['order_item_profit_ratio', 'profit_category']].head())
 
     fig1, ax1 = plt.subplots()
