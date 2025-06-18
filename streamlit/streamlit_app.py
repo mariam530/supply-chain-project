@@ -5,6 +5,8 @@ import seaborn as sns
 import numpy as np
 import plotly.express as px
 
+
+
 st.set_page_config(page_title="Supply Chain Analysis", layout="wide")
 
 st.title("DataCo Supply Chain Data Analysis and Cleaning")
@@ -97,13 +99,7 @@ try:
     df['Order_Quarter'] = pd.to_datetime(df['order_date']).dt.to_period('Q')
 
 # Custom_Profit_Level
-    def classify_profit(ratio):
-    if ratio < 0.2:
-        return 'low'
-    elif ratio <= 0.5:
-        return 'medium'
-    else:
-        return 'high'
+
     df['Profit_Category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
 
 # Order_Type_Classification
@@ -111,16 +107,15 @@ try:
 
     #  3. Profit Classification 
     st.header(" Profit Category Classification")
-
     def classify_profit(ratio):
-        if ratio <= 0.2:
-            return 'low'
-        elif ratio <= 0.5:
-            return 'medium'
-        else:
-            return 'high'
-
+      if ratio < 0.2:
+        return 'low'
+      elif ratio <= 0.5:
+        return 'medium'
+      else:
+        return 'high'
     df['profit_category'] = df['order_item_profit_ratio'].apply(classify_profit)
+
     st.write(df[['order_item_profit_ratio', 'profit_category']].head())
 
     fig1, ax1 = plt.subplots()
@@ -221,7 +216,6 @@ try:
 
     if df[selected_uni].dtype in ['int64', 'float64']:
         fig_uni = px.histogram(df, x=selected_uni, nbins=30, marginal='box', title=f'Distribution of {selected_uni}')
-    else:
         value_counts_df = df[selected_uni].value_counts().reset_index()
         value_counts_df.columns = [selected_uni, 'count']
         fig_uni = px.bar(
@@ -245,7 +239,6 @@ try:
         fig_bi = px.box(df, x=col1, y=col2, title=f'{col2} by {col1}')
     elif df[col2].dtype == 'object' and df[col1].dtype in ['int64', 'float64']:
         fig_bi = px.box(df, x=col2, y=col1, title=f'{col1} by {col2}')
-    else:
         fig_bi = None
         st.warning("Cannot plot selected combination.")
 
@@ -260,7 +253,6 @@ try:
     if len(selected_multi) >= 2:
         fig_mv = px.scatter_matrix(df, dimensions=selected_multi, title='Scatter Matrix of Selected Variables')
         st.plotly_chart(fig_mv)
-    else:
         st.info("Please select at least 2 numeric columns.")
 
 
@@ -280,5 +272,11 @@ try:
 
 except FileNotFoundError:
     st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
+
+
+
+
+
+
 
 
