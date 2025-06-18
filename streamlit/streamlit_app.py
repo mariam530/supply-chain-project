@@ -44,6 +44,26 @@ try:
     df.drop_duplicates(inplace=True)
     df.fillna(0, inplace=True)
     st.write(" Cleaned data preview:")
+    # 2.1 Remove Irrelevant Columns
+    columns_to_drop = [
+        'customer_id',
+        'customer_email',
+        'customer_password',
+        'customer_street',
+        'customer_zipcode',
+        'order_id',
+        'order_customer_id',
+        'order_item_id',
+        'order_item_cardprod_id',
+        'product_card_id',
+        'product_category_id',
+        'product_image',
+        'product_description'
+    ]
+    columns_to_drop = [col for col in columns_to_drop if col in df.columns]
+    df.drop(columns=columns_to_drop, inplace=True)
+    st.success("Irrelevant columns dropped.")
+
     st.dataframe(df.head())
 
     #  3. Profit Classification 
@@ -119,14 +139,47 @@ try:
         risk_by_type = df.groupby('order_type')['late_delivery_risk'].mean()
         st.bar_chart(risk_by_type)
 
-    #  9. Correlation Heatmap 
+
+    # 9. Profitability Category Pie Chart (twice as requested)
+    st.header(" Average Profit Margin by Profitability Category")
+
+    if 'profitability_category' in df.columns and 'profit_margin' in df.columns:
+        avg_profit = df.groupby('profitability_category')['profit_margin'].mean().reset_index()
+        fig_pie1 = px.pie(
+            data_frame=avg_profit,
+            names='profitability_category',
+            values='profit_margin',
+            title='Average Profit Margin per Profitability Category (Chart 1)'
+        )
+        st.plotly_chart(fig_pie1)
+
+        fig_pie2 = px.pie(
+            data_frame=avg_profit,
+            names='profitability_category',
+            values='profit_margin',
+            title='Average Profit Margin per Profitability Category (Chart 2)'
+        )
+        st.plotly_chart(fig_pie2)
+    else:
+        st.warning("Columns 'profitability_category' or 'profit_margin' not found in the dataset.")
+
+    #  10. Correlation Heatmap 
     st.header(" Correlation Heatmap")
     corr = df.select_dtypes(include='number').corr()
     fig5, ax5 = plt.subplots(figsize=(10, 6))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax5)
+    # sns.heatmap removed for new larger heatmap
     st.pyplot(fig5)
 
-    # 10. Univariate Analysis
+    
+    # 🔍 Correlation Heatmap (After Column Removal)
+    st.header(" Enhanced Correlation Heatmap")
+    corr = df.select_dtypes(include='number').corr()
+    fig_corr, ax_corr = plt.subplots(figsize=(16, 10))  
+    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax_corr)
+    st.pyplot(fig_corr)
+
+
+    # 11. Univariate Analysis
     st.header("Univariate Analysis")
     selected_uni = st.selectbox("Choose a column for univariate analysis", df.columns)
 
@@ -147,7 +200,7 @@ try:
         )
     st.plotly_chart(fig_uni)
 
-    # 11. Bivariate Analysis
+    # 12. Bivariate Analysis
     st.header("Bivariate Analysis")
 
     col1 = st.selectbox("Select first column", df.columns, key="bi_col1")
@@ -166,7 +219,7 @@ try:
     if fig_bi:
         st.plotly_chart(fig_bi)
 
-    # 12. Multivariate Analysis
+    # 13. Multivariate Analysis
     st.header("Multivariate Analysis (Scatter Matrix with Plotly)")
 
     selected_multi = st.multiselect("Choose up to 5 numeric columns", num_cols, max_selections=5)
@@ -176,6 +229,21 @@ try:
         st.plotly_chart(fig_mv)
     else:
         st.info("Please select at least 2 numeric columns.")
+
+
+    
+    # Sorted Statistics
+    st.header("Sorted Statistics for Numeric Columns")
+
+    numeric_cols = df.select_dtypes(include='number').columns.tolist()
+    selected_sort_col = st.selectbox("Select column to sort", numeric_cols, key="sort_col")
+    sort_order = st.radio("Select sort order", ["Ascending", "Descending"], key="sort_order")
+
+    sorted_df = df.sort_values(by=selected_sort_col, ascending=(sort_order == "Ascending"))
+    st.write(f"Top 10 rows sorted by {selected_sort_col} ({sort_order}):")
+    st.dataframe(sorted_df[[selected_sort_col]].head(10))
+
+
 
 except FileNotFoundError:
     st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
