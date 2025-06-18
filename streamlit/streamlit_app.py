@@ -97,9 +97,6 @@ try:
 
 
 
-# Custom_Profit_Level
-
-    df['Profit_Category'] = df['Order_Item_Profit_Ratio'].apply(classify_profit)
 
 # Order_Type_Classification
     df['Order_Type'] = np.where((df['order_item_product_price'] > 1000) & (df['order_item_discount'] < 100), 'premium', 'regular')
