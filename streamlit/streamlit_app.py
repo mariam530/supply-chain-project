@@ -200,7 +200,11 @@ try:
     selected_uni = st.selectbox(
         "Choose a column for univariate analysis",
         df.columns,
-        index=df.columns.get_loc("type") if "type" in df.columns else 0
+        index=df.columns.get_loc("benefit_per_order") if "benefit_per_order" in df.columns else 0
+    )
+    "Choose a column for univariate analysis",
+    df.columns,
+    index=df.columns.get_loc("type") if "type" in df.columns else 0
     )
 
     st.write("Summary Statistics:")
