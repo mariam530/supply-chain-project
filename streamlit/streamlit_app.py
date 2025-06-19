@@ -104,7 +104,8 @@ try:
     st.write(df[['order_item_profit_ratio', 'profit_category']].head())
 
     fig1, ax1 = plt.subplots()
-    sns.countplot(data=df, x='profit_category', ax=ax1)
+    order = df['profit_category'].value_counts().sort_values(ascending=False).index
+    sns.countplot(data=df, x='profit_category', ax=ax1, order=order)
     st.pyplot(fig1)
 
     #  4. Order Type Classification 
@@ -118,7 +119,8 @@ try:
     st.write(df[['order_item_product_price', 'order_item_discount', 'order_type']].head())
 
     fig2, ax2 = plt.subplots()
-    sns.countplot(data=df, x='order_type', ax=ax2)
+    order = df['order_type'].value_counts().sort_values(ascending=False).index
+    sns.countplot(data=df, x='order_type', ax=ax2, order=order)
     st.pyplot(fig2)
 
     #  5. Visual Exploration 
@@ -135,7 +137,7 @@ try:
 
     if cat_cols:
         selected_cat = st.selectbox("Choose a categorical column", cat_cols)
-        st.bar_chart(df[selected_cat].value_counts())
+        st.bar_chart(df[selected_cat].value_counts().sort_values(ascending=False))
 
     #  6. Profit by Region 
     st.header(" Profit Distribution by Region")
@@ -153,8 +155,9 @@ try:
         )
         st.write(df[['sales_per_customer', 'customer_segment']].head())
         fig4, ax4 = plt.subplots()
-        sns.countplot(data=df, x='customer_segment', ax=ax4)
-        st.pyplot(fig4)
+    order = df['customer_segment'].value_counts().sort_values(ascending=False).index
+    sns.countplot(data=df, x='customer_segment', ax=ax4, order=order)
+    st.pyplot(fig4)
 
     #  8. Late Delivery Risk Analysis 
     st.header("🚚 Late Delivery Risk Analysis")
