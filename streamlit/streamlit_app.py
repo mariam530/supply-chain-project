@@ -197,7 +197,11 @@ try:
 
     # 11. Univariate Analysis
     st.header("Univariate Analysis")
-    selected_uni = st.selectbox("Choose a column for univariate analysis", df.columns)
+    selected_uni = st.selectbox(
+        "Choose a column for univariate analysis",
+        df.columns,
+        index=df.columns.get_loc("type") if "type" in df.columns else 0
+    )
 
     st.write("Summary Statistics:")
     st.write(df[selected_uni].describe())
@@ -218,8 +222,18 @@ try:
     # 12. Bivariate Analysis
     st.header("Bivariate Analysis")
 
-    col1 = st.selectbox("Select first column", df.columns, key="bi_col1")
-    col2 = st.selectbox("Select second column", df.columns, key="bi_col2")
+    col1 = st.selectbox(
+        "Select first column",
+        df.columns,
+        index=df.columns.get_loc("customer_country") if "customer_country" in df.columns else 0,
+        key="bi_col1"
+    )
+    col2 = st.selectbox(
+        "Select second column",
+        df.columns,
+        index=df.columns.get_loc("days_for_shipping_(real)") if "days_for_shipping_(real)" in df.columns else 0,
+        key="bi_col2"
+    )
 
     if df[col1].dtype in ['int64', 'float64'] and df[col2].dtype in ['int64', 'float64']:
         fig_bi = px.scatter(df, x=col1, y=col2, trendline="ols", title=f'{col1} vs {col2}')
@@ -236,7 +250,13 @@ try:
     # 13. Multivariate Analysis
     st.header("Multivariate Analysis (Scatter Matrix with Plotly)")
 
-    selected_multi = st.multiselect("Choose up to 5 numeric columns", num_cols, max_selections=5)
+    default_multi = [col for col in ["order_item_discount", "order_item_quantity", "profit_margin"] if col in num_cols]
+    selected_multi = st.multiselect(
+        "Choose up to 5 numeric columns",
+        num_cols,
+        default=default_multi,
+        max_selections=5
+    )
 
     if len(selected_multi) >= 2:
         fig_mv = px.scatter_matrix(df, dimensions=selected_multi, title='Scatter Matrix of Selected Variables')
@@ -260,6 +280,14 @@ try:
 
 except FileNotFoundError:
     st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
+
+
+
+
+
+
+
+
 
 
 
