@@ -204,8 +204,6 @@ try:
     )
     "Choose a column for univariate analysis",
     df.columns,
-    index=df.columns.get_loc("type") if "type" in df.columns else 0
-    )
 
     st.write("Summary Statistics:")
     st.write(df[selected_uni].describe())
@@ -284,6 +282,10 @@ try:
 
 except FileNotFoundError:
     st.error("Dataset file not found. Please make sure 'DataCoSupplyChainDataset.csv' is in the same folder.")
+
+
+
+
 
 
 
